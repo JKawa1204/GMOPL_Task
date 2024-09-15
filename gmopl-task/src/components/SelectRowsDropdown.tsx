@@ -3,23 +3,32 @@ import { Button } from 'primereact/button';
 import { OverlayPanel } from 'primereact/overlaypanel';
 import 'primereact/resources/themes/lara-light-indigo/theme.css';
 import 'primereact/resources/primereact.min.css';
-import 'primeicons/primeicons.css'; 
+import 'primeicons/primeicons.css';
 
+interface SelectRowsDropdownProps {
+    onSelectRows: (count: number) => void;
+}
 
-export default function SelectRowsDropdown({ onSelectRows }) {
-    const [selectionCount, setSelectionCount] = useState('');
-    const overlayPanelRef = useRef(null);
+export default function SelectRowsDropdown({ onSelectRows }: SelectRowsDropdownProps) {
+    const [selectionCount, setSelectionCount] = useState<number | ''>('');
+    const overlayPanelRef = useRef<OverlayPanel>(null);
 
     const handleSubmit = () => {
-        if (selectionCount) {
+        if (selectionCount !== '') {
             onSelectRows(selectionCount);
-            overlayPanelRef.current.hide(); // Close the dropdown after submitting
+            if (overlayPanelRef.current) {
+                overlayPanelRef.current.hide();
+            }
         }
     };
 
     return (
         <div className="flex items-center">
-            <Button icon="pi pi-caret-down" className="p-button-text  bg-slate-100" onClick={(e) => overlayPanelRef.current.toggle(e)} />
+            <Button
+                icon="pi pi-caret-down"
+                className="p-button-text bg-slate-100"
+                onClick={(e) => overlayPanelRef.current && overlayPanelRef.current.toggle(e)}
+            />
 
             <OverlayPanel ref={overlayPanelRef} style={{ width: '200px' }}>
                 <div className="p-2">
@@ -27,7 +36,7 @@ export default function SelectRowsDropdown({ onSelectRows }) {
                         type="number"
                         placeholder="Select rows..."
                         value={selectionCount}
-                        onChange={(e) => setSelectionCount(e.target.value)}
+                        onChange={(e) => setSelectionCount(e.target.value ? parseInt(e.target.value, 10) : '')}
                         className="p-2 border border-gray-300 rounded w-full"
                     />
                     <button
